@@ -42,7 +42,7 @@ class Cbs
     protected $revenueHeads;
 
     /**
-     * Issue Category ID from CBS.
+     * Issue Category ID from CBS Admin.
      * @var int
      */
     protected $categoryId;
