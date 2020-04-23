@@ -2,14 +2,14 @@
 
 namespace Infinitypaul\LaravelCbs\Tests;
 
-use Infinitypaul\LaravelCbs\LaravelCbsServiceProvider;
+use Infinitypaul\Cbs\CbsServiceProvider;
 use Orchestra\Testbench\TestCase;
 
 class ExampleTest extends TestCase
 {
     protected function getPackageProviders($app)
     {
-        return [LaravelCbsServiceProvider::class];
+        return [CbsServiceProvider::class];
     }
 
     /** @test */
