@@ -255,7 +255,7 @@ In the controller that handles the request coming from the payment provider, we 
 
 `Cbs::getPaymentData()` - This function does the calculation and ensure it is a valid transction else it throws an exception.
 
->For A Returnee User Rather Than sending the fullname, email, mobile_number , all you need to send it the PayerId which is gotten the first time you generate an invoice
+>For A Returnee User Rather Than sending the full Name, email, mobile_number , all you need to send it the PayerId which is gotten the first time you generate an invoice
 
 Have A Look
 
