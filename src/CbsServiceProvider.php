@@ -20,13 +20,10 @@ class CbsServiceProvider extends ServiceProvider
      */
     public function boot()
     {
-
-
         if ($this->app->runningInConsole()) {
             $this->publishes([
-                __DIR__ . '/../config/cbs.php' => config_path('cbs.php'),
+                __DIR__.'/../config/cbs.php' => config_path('cbs.php'),
             ], 'config');
-
         }
     }
 
@@ -36,7 +33,7 @@ class CbsServiceProvider extends ServiceProvider
     public function register()
     {
         // Automatically apply the package configuration
-        $this->mergeConfigFrom(__DIR__ . '/../config/cbs.php', 'cbs');
+        $this->mergeConfigFrom(__DIR__.'/../config/cbs.php', 'cbs');
 
         // Register the main class to use with the facade
         $this->app->singleton('laravel-cbs', function () {
