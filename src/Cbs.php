@@ -7,16 +7,16 @@
  * For the full copyright and license information, please view the LICENSE
  * file that was distributed with this source code.
  */
+
 namespace Infinitypaul\Cbs;
 
-use Illuminate\Support\Facades\Config;
 use GuzzleHttp\Client;
+use Illuminate\Support\Facades\Config;
 use Infinitypaul\Cbs\Exceptions\InvalidPostException;
 use Infinitypaul\Cbs\Exceptions\NotSetException;
 
 class Cbs
 {
-
     protected $secretKey;
 
     protected $clientId;
@@ -33,10 +33,10 @@ class Cbs
 
     protected $url;
 
-    protected $invoice= [];
+    protected $invoice = [];
 
     /**
-     * Instance of Client
+     * Instance of Client.
      * @var Client
      */
     protected $client;
@@ -46,15 +46,15 @@ class Cbs
         $this->setUrl();
         $this->setConstant();
         $this->checkConstant();
-
     }
 
-    public function setUrl(){
-       $this->baseUrl = Config::get('mode') === 'test' ? Config::get('cbs.testUrl') : Config::get('cbs.liveURL');
+    public function setUrl()
+    {
+        $this->baseUrl = Config::get('mode') === 'test' ? Config::get('cbs.testUrl') : Config::get('cbs.liveURL');
     }
 
     /**
-     * Get secret key from CBS config file
+     * Get secret key from CBS config file.
      */
     public function setConstant()
     {
@@ -64,28 +64,36 @@ class Cbs
         $this->categoryId = Config::get('cbs.categoryId');
     }
 
-    protected function checkConstant(){
-        if(!$this->revenueHeads) throw new NotSetException('Set Your Revenue Head');
-
-        if(!$this->clientId) throw new NotSetException('Set Your Client Id');
-
-        if(!$this->secretKey) throw new NotSetException('Set Your Secret Id');
-        if(!$this->categoryId) throw new NotSetException('Set Your Category Id');
-        if(!$this->baseUrl) throw new NotSetException('Set Your Test and Live Base Url');
+    protected function checkConstant()
+    {
+        if (! $this->revenueHeads) {
+            throw new NotSetException('Set Your Revenue Head');
+        }
+        if (! $this->clientId) {
+            throw new NotSetException('Set Your Client Id');
+        }
+        if (! $this->secretKey) {
+            throw new NotSetException('Set Your Secret Id');
+        }
+        if (! $this->categoryId) {
+            throw new NotSetException('Set Your Category Id');
+        }
+        if (! $this->baseUrl) {
+            throw new NotSetException('Set Your Test and Live Base Url');
+        }
     }
 
-
-    protected function setSignature($amount, $callback){
-        $amount = number_format((float)$amount, 2, '.', '');
-        $string = $this->revenueHeads . $amount . $callback . $this->clientId;
+    protected function setSignature($amount, $callback)
+    {
+        $amount = number_format((float) $amount, 2, '.', '');
+        $string = $this->revenueHeads.$amount.$callback.$this->clientId;
         //dd($string);
-        $this->signature = base64_encode(hash_hmac('sha256', $string, $this->secretKey,true));
+        $this->signature = base64_encode(hash_hmac('sha256', $string, $this->secretKey, true));
         $this->setRequestOptions();
-
     }
 
     /**
-     * Set options for making the Client request
+     * Set options for making the Client request.
      */
     private function setRequestOptions()
     {
@@ -95,8 +103,8 @@ class Cbs
                 'Content-Type' => 'application/json',
                 'Accept' => 'application/json',
                 'CLIENTID' => $this->clientId,
-                'Signature' => $this->signature
-            ]
+                'Signature' => $this->signature,
+            ],
         ]);
     }
 
@@ -108,12 +116,13 @@ class Cbs
      * @return \Infinitypaul\Cbs\Cbs
      * @throws \Infinitypaul\Cbs\Exceptions\NotSetException
      */
-
     private function setHttpResponse($relativeUri, $method, $body = [])
     {
-        if(is_null($method)) throw new NotSetException('Empty Method Not Allowed');
+        if (is_null($method)) {
+            throw new NotSetException('Empty Method Not Allowed');
+        }
         $this->response = $this->client->{strtolower($method)}(
-            $this->baseUrl . $relativeUri,
+            $this->baseUrl.$relativeUri,
             ['body' => json_encode($body)]
         );
 
@@ -128,16 +137,17 @@ class Cbs
     /**
      * Initiate a payment request to Cbs
      * Included the option to pass the payload to this method for situations
-     * when the payload is built on the fly (not passed to the controller from a view)
+     * when the payload is built on the fly (not passed to the controller from a view).
      *
      * @param null $data
      *
      * @return \Infinitypaul\Cbs\Cbs
      * @throws \Infinitypaul\Cbs\Exceptions\NotSetException
      */
-    public function generateInvoice($data=null){
-        if ( $data == null ) {
-            if(request()->has('payerID')){
+    public function generateInvoice($data = null)
+    {
+        if ($data == null) {
+            if (request()->has('payerID')) {
                 $user = ['PayerId' => request()->payerID];
             } else {
                 $user = [
@@ -145,21 +155,21 @@ class Cbs
                     'Email' => request()->email,
                     'Address' => request()->address,
                     'PhoneNumber' => request()->mobile_number,
-                    'TaxPayerIdentificationNumber' => request()->tin
+                    'TaxPayerIdentificationNumber' => request()->tin,
                 ];
             }
             $TaxEntityInvoice = [
                 'TaxEntity' => $user,
                 'Amount' => intval(request()->amount),
                 'InvoiceDescription' => request()->description,
-                'CategoryId' => $this->categoryId
+                'CategoryId' => $this->categoryId,
             ];
             $data = [
                 'RevenueHeadId' => $this->revenueHeads,
                 'TaxEntityInvoice' => $TaxEntityInvoice,
                 'CallBackURL' => request()->callback,
                 'RequestReference' => ReferenceNumber::getHashedToken(),
-                'Quantity' => request()->quantity
+                'Quantity' => request()->quantity,
 
             ];
 
@@ -168,32 +178,31 @@ class Cbs
         }
 
         $this->setHttpResponse('/api/v1/invoice/create', 'POST', $data);
+
         return $this;
     }
 
     /**
-     * Set the invoice data from the callback response
+     * Set the invoice data from the callback response.
      */
     public function setInvoice()
     {
         $this->generateInvoice();
         $this->invoice = $this->getResponse();
-        return $this;
 
+        return $this;
     }
 
     /**
-     * Get the invoice data from the callback response
+     * Get the invoice data from the callback response.
      */
     public function getData()
     {
-
         return $this->invoice;
-
     }
 
     /**
-     * Get the invoice payment url from the callback response
+     * Get the invoice payment url from the callback response.
      */
     public function redirectNow()
     {
@@ -201,7 +210,7 @@ class Cbs
     }
 
     /**
-     * Compute Mac Address
+     * Compute Mac Address.
      *
      * @param $invoiceNumber
      * @param $paymentRef
@@ -210,28 +219,26 @@ class Cbs
      *
      * @return string
      */
-    protected function computeMac($invoiceNumber, $paymentRef, $amount){
-        $amount = number_format((float)$amount, 2, '.', '');
-        $string = $invoiceNumber. $amount . $paymentRef;
-        return base64_encode(hash_hmac('sha256', $string, $this->secretKey,true));
+    protected function computeMac($invoiceNumber, $paymentRef, $amount)
+    {
+        $amount = number_format((float) $amount, 2, '.', '');
+        $string = $invoiceNumber.$amount.$paymentRef;
+
+        return base64_encode(hash_hmac('sha256', $string, $this->secretKey, true));
     }
 
     /**
-     * Get Payment details if the transaction was verified successfully
+     * Get Payment details if the transaction was verified successfully.
      *
      * @throws \Infinitypaul\Cbs\Exceptions\InvalidPostException
      */
     public function getPaymentData()
     {
         $mac = $this->computeMac(request()->InvoiceNumber, request()->PaymentRef, request()->AmountPaid);
-        if($mac != request()->Mac){
+        if ($mac != request()->Mac) {
             throw new InvalidPostException('Invalid Call');
         } else {
             return request()->all();
         }
-
     }
-
-
-
 }

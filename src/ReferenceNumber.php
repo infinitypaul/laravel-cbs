@@ -1,13 +1,11 @@
 <?php
 
-
 namespace Infinitypaul\Cbs;
-
 
 class ReferenceNumber
 {
     /**
-     * Get the pool to use based on the type of prefix hash
+     * Get the pool to use based on the type of prefix hash.
      * @param  string $type
      * @return string
      */
@@ -41,10 +39,10 @@ class ReferenceNumber
     }
 
     /**
-     * Generate a random secure crypt figure
-     * @param  integer $min
-     * @param  integer $max
-     * @return integer
+     * Generate a random secure crypt figure.
+     * @param  int $min
+     * @param  int $max
+     * @return int
      */
     private static function secureCrypt($min, $max)
     {
@@ -54,9 +52,9 @@ class ReferenceNumber
             return $min; // not so random...
         }
 
-        $log    = log($range, 2);
-        $bytes  = (int) ($log / 8) + 1; // length in bytes
-        $bits   = (int) $log + 1; // length in bits
+        $log = log($range, 2);
+        $bytes = (int) ($log / 8) + 1; // length in bytes
+        $bits = (int) $log + 1; // length in bits
         $filter = (int) (1 << $bits) - 1; // set all lower bits to 1
         do {
             $rnd = hexdec(bin2hex(openssl_random_pseudo_bytes($bytes)));
@@ -67,14 +65,14 @@ class ReferenceNumber
     }
 
     /**
-     * Finally, generate a hashed token
-     * @param  integer $length
+     * Finally, generate a hashed token.
+     * @param  int $length
      * @return string
      */
     public static function getHashedToken($length = 25)
     {
-        $token = "";
-        $max   = strlen(static::getPool());
+        $token = '';
+        $max = strlen(static::getPool());
         for ($i = 0; $i < $length; $i++) {
             $token .= static::getPool()[static::secureCrypt(0, $max)];
         }
