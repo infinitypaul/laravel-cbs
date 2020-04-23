@@ -18,55 +18,55 @@ use Infinitypaul\Cbs\Exceptions\NotSetException;
 class Cbs
 {
     /**
-     * Issue Secret Key from CBS
+     * Issue Secret Key from CBS.
      * @var string
      */
     protected $secretKey;
 
     /**
-     * Issue Client ID from CBS
+     * Issue Client ID from CBS.
      * @var string
      */
     protected $clientId;
 
     /**
-     * Issue URL from CBS
+     * Issue URL from CBS.
      * @var string
      */
     protected $baseUrl;
 
     /**
-     * Issue Revenue Head from CBS
-     * @var integer
+     * Issue Revenue Head from CBS.
+     * @var int
      */
     protected $revenueHeads;
 
     /**
-     * Issue Category ID from CBS
-     * @var integer
+     * Issue Category ID from CBS.
+     * @var int
      */
     protected $categoryId;
 
     /**
-     *  Response from requests made to CBS
+     *  Response from requests made to CBS.
      * @var mixed
      */
     protected $response;
 
     /**
-     *  Hashed Key
+     *  Hashed Key.
      * @var mixed
      */
     protected $signature;
 
     /**
-     * Payment Url - CBS payment page
+     * Payment Url - CBS payment page.
      * @var string
      */
     protected $url;
 
     /**
-     *  Response from CBS
+     *  Response from CBS.
      * @var mixed
      */
     protected $invoice = [];
