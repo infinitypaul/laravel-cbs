@@ -1,7 +1,6 @@
 language: php
 
 php:
-    - 5.5
     - 7.1
     - 7.2
     - 7.3
@@ -17,8 +16,6 @@ env:
 
 matrix:
     include:
-        - php: 5.5
-          env: LARAVEL=5.5.* COVERAGE=yes
         - php: 7.1
           env: LARAVEL=5.5.* COVERAGE=yes
         - php: 7.1
