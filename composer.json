@@ -1,0 +1,60 @@
+{
+    "name": "infinitypaul/laravel-cbs",
+    "description": "A Laravel Package for working with central billing system seamlessly",
+    "keywords": [
+        "infinitypaul",
+        "laravel-cbs",
+        "Parkway Project",
+        "Edward Paul",
+        "Central Billing System",
+        "Invoice"
+    ],
+    "homepage": "https://github.com/infinitypaul/laravel-cbs",
+    "license": "MIT",
+    "type": "library",
+    "authors": [
+        {
+            "name": "Paul Edward",
+            "email": "infinitypaul@live.com",
+            "role": "Developer"
+        }
+    ],
+    "require": {
+        "php": "^5.4.0|^7.0",
+        "illuminate/support": "5.*|6.*|7.*",
+        "guzzlehttp/guzzle": "5.*|6.*",
+        "ext-json": "*"
+    },
+    "require-dev": {
+        "orchestra/testbench": "3.*|4.*|5.*",
+        "phpunit/phpunit" : "4.*"
+    },
+    "autoload": {
+        "psr-4": {
+            "Infinitypaul\\Cbs\\": "src"
+        }
+    },
+    "autoload-dev": {
+        "psr-4": {
+            "Infinitypaul\\Cbs\\Tests\\": "tests"
+        }
+    },
+    "scripts": {
+        "test": "vendor/bin/phpunit",
+        "test-coverage": "vendor/bin/phpunit --coverage-html coverage"
+
+    },
+    "config": {
+        "sort-packages": true
+    },
+    "extra": {
+        "laravel": {
+            "providers": [
+                "Infinitypaul\\Cbs\\CbsServiceProvider"
+            ],
+            "aliases": {
+                "Cbs": "Infinitypaul\\Cbs\\Facades\\Cbs"
+            }
+        }
+    }
+}
