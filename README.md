@@ -295,7 +295,7 @@ Have A Look
 
 ### Bug & Features
 
-If you have spotted any bugs, or would like to request additional features from the library, please file an issue via the Issue Tracker on the project's Github page: [https://github.com/infinitypaul/laravel-database-filter/issues](https://github.com/infinitypaul/laravel-cbs/issues).
+If you have spotted any bugs, or would like to request additional features from the library, please file an issue via the Issue Tracker on the project's Github page: [https://github.com/infinitypaul/laravel-cbs-filter/issues](https://github.com/infinitypaul/laravel-cbs/issues).
 
 ## How can I thank you?
 
