@@ -17,5 +17,4 @@ checks:
         fix_identation_4spaces: true
         fix_doc_comments: true
     excluded_dependencies:
-        phpunit/phpunit
-
+        - phpunit/phpunit
