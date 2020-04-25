@@ -319,7 +319,7 @@ If you have spotted any bugs, or would like to request additional features from 
 
 Why not star the github repo? I'd love the attention! Why not share the link for this repository on Twitter or HackerNews? Spread the word!
 
-Don't forget to [follow me on twitter](https://twitter.com/infinitypaul)!
+Don't forget to [follow me on twitter](https://twitter.com/infinitypaul) || [or on medium](https://medium.com/@infinitypaul)
 
 Thanks!
 Edward Paul.
