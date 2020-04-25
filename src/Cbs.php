@@ -12,7 +12,6 @@ namespace Infinitypaul\Cbs;
 
 use GuzzleHttp\Client;
 use Illuminate\Support\Facades\Config;
-use Illuminate\Support\Facades\Log;
 use Infinitypaul\Cbs\Exceptions\InvalidPostException;
 use Infinitypaul\Cbs\Exceptions\NotSetException;
 
@@ -171,9 +170,8 @@ class Cbs
         return json_decode($this->response->getBody(), true);
     }
 
-
-    protected function setUser($data){
-
+    protected function setUser($data)
+    {
         if (isset($data['payerID'])) {
             $user = ['PayerId' => $data['payerID']];
         } else {
@@ -185,6 +183,7 @@ class Cbs
                 'TaxPayerIdentificationNumber' => $data['tin'],
             ];
         }
+
         return [
             'TaxEntity' => $user,
             'Amount' => intval($data['amount']),
@@ -223,7 +222,7 @@ class Cbs
             'CallBackURL' => $callback,
             'RequestReference' => ReferenceNumber::getHashedToken(),
             'Quantity' => $quantity,
-            'ExternalRefNumber' => $ExternalRefNumber
+            'ExternalRefNumber' => $ExternalRefNumber,
 
         ];
 
@@ -283,6 +282,7 @@ class Cbs
     {
         $amount = number_format((float) $amount, 2, '.', '');
         $string = $invoiceNumber.$paymentRef.$amount.$RequestReference;
+
         return base64_encode(hash_hmac('sha256', $string, $this->secretKey, true));
     }
 
