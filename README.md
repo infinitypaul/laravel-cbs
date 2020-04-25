@@ -194,6 +194,21 @@ Let me explain the fluent methods this package provides a bit here.
 Cbs::setInvoice()->redirectNow();
 
 /**
+*  SetInvoice can also accept an array instead of a request object and you are good to go, it will be in this format
+ */
+
+        $data = [
+            "payerID" => "ST-000408",
+  "amount" => "230",
+  "description" => "Testing",
+  "callback" => route('callback'),
+  "quantity" => "5",
+            'externalRefNumber' => time()
+];
+        $data = Cbs::setInvoice($data)->getData();
+
+
+/**
  * This fluent method does all the dirty work of verifying that the just concluded transaction was actually valid,
  */
 Cbs::getPaymentData();
@@ -228,7 +243,9 @@ A sample form will look like so:
             <input type="hidden" name="quantity" value="3">
             <input type="hidden" name="description" value="Test Buy" > 
             <input type="hidden" name="callback" value="{{ route('callback') }}"> {{-- required --}}
-           
+<input type="hidden" name="externalRefNumber" value="{{ time() }}" > {{-- optional --}}
+
+          
             {{ csrf_field() }} {{-- works only when using laravel 5.1, 5.2 --}}
 
              <input type="hidden" name="_token" value="{{ csrf_token() }}"> {{-- employ this in place of csrf_field only in laravel 5.0 --}}
@@ -275,6 +292,7 @@ Have A Look
             <input type="hidden" name="amount" value="1000"> {{-- required --}}
             <input type="hidden" name="quantity" value="3">
             <input type="hidden" name="description" value="Test Buy" > 
+<input type="hidden" name="externalRefNumber" value="{{ time() }}" > {{-- optional --}}
             <input type="hidden" name="callback" value="{{ route('callback') }}"> {{-- required --}}
            
             {{ csrf_field() }} {{-- works only when using laravel 5.1, 5.2 --}}

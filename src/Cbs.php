@@ -12,6 +12,7 @@ namespace Infinitypaul\Cbs;
 
 use GuzzleHttp\Client;
 use Illuminate\Support\Facades\Config;
+use Illuminate\Support\Facades\Log;
 use Infinitypaul\Cbs\Exceptions\InvalidPostException;
 use Infinitypaul\Cbs\Exceptions\NotSetException;
 
@@ -170,48 +171,64 @@ class Cbs
         return json_decode($this->response->getBody(), true);
     }
 
+
+    protected function setUser($data){
+
+        if (isset($data['payerID'])) {
+            $user = ['PayerId' => $data['payerID']];
+        } else {
+            $user = [
+                'Recipient' => $data['full_name'],
+                'Email' => $data['email'],
+                'Address' => $data['address'],
+                'PhoneNumber' => $data['mobile_number'],
+                'TaxPayerIdentificationNumber' => $data['tin'],
+            ];
+        }
+        return [
+            'TaxEntity' => $user,
+            'Amount' => intval($data['amount']),
+            'InvoiceDescription' => $data['description'],
+            'CategoryId' => $this->categoryId,
+        ];
+    }
+
     /**
      * Initiate a payment request to Cbs
      * Included the option to pass the payload to this method for situations
      * when the payload is built on the fly (not passed to the controller from a view).
      *
-     * @param null $data
+     * @param array $data
      *
      * @return \Infinitypaul\Cbs\Cbs
      * @throws \Infinitypaul\Cbs\Exceptions\NotSetException
      */
-    public function generateInvoice($data = null)
+    public function generateInvoice($data)
     {
-        if ($data == null) {
-            if (request()->has('payerID')) {
-                $user = ['PayerId' => request()->payerID];
-            } else {
-                $user = [
-                    'Recipient' => request()->full_name,
-                    'Email' => request()->email,
-                    'Address' => request()->address,
-                    'PhoneNumber' => request()->mobile_number,
-                    'TaxPayerIdentificationNumber' => request()->tin,
-                ];
-            }
-            $TaxEntityInvoice = [
-                'TaxEntity' => $user,
-                'Amount' => intval(request()->amount),
-                'InvoiceDescription' => request()->description,
-                'CategoryId' => $this->categoryId,
-            ];
-            $data = [
-                'RevenueHeadId' => $this->revenueHeads,
-                'TaxEntityInvoice' => $TaxEntityInvoice,
-                'CallBackURL' => request()->callback,
-                'RequestReference' => ReferenceNumber::getHashedToken(),
-                'Quantity' => request()->quantity,
-
-            ];
-
-            $this->setSignature(request()->amount, request()->callback);
-            array_filter($data);
+        if (empty($data)) {
+            $TaxEntityInvoice = $this->setUser(request()->toArray());
+            $callback = request()->callback;
+            $quantity = request()->quantity;
+            $ExternalRefNumber = request()->has('externalRefNumber') ? request()->externalRefNumber : null;
+        } else {
+            $TaxEntityInvoice = $this->setUser($data);
+            $callback = $data['callback'];
+            $quantity = $data['quantity'];
+            $ExternalRefNumber = isset($data['externalRefNumber']) ? $data['externalRefNumber'] : null;
         }
+
+        $data = [
+            'RevenueHeadId' => $this->revenueHeads,
+            'TaxEntityInvoice' => $TaxEntityInvoice,
+            'CallBackURL' => $callback,
+            'RequestReference' => ReferenceNumber::getHashedToken(),
+            'Quantity' => $quantity,
+            'ExternalRefNumber' => $ExternalRefNumber
+
+        ];
+
+        $this->setSignature($TaxEntityInvoice['Amount'], $callback);
+        array_filter($data);
 
         $this->setHttpResponse('/api/v1/invoice/create', 'POST', $data);
 
@@ -220,10 +237,15 @@ class Cbs
 
     /**
      * Set the invoice data from the callback response.
+     *
+     * @param array $data
+     *
+     * @return \Infinitypaul\Cbs\Cbs
+     * @throws \Infinitypaul\Cbs\Exceptions\NotSetException
      */
-    public function setInvoice()
+    public function setInvoice($data = [])
     {
-        $this->generateInvoice();
+        $this->generateInvoice($data);
         $this->invoice = $this->getResponse();
 
         return $this;
@@ -253,13 +275,14 @@ class Cbs
      * @param $amount
      *
      *
+     * @param $RequestReference
+     *
      * @return string
      */
-    protected function computeMac($invoiceNumber, $paymentRef, $amount)
+    protected function computeMac($invoiceNumber, $paymentRef, $amount, $RequestReference)
     {
         $amount = number_format((float) $amount, 2, '.', '');
-        $string = $invoiceNumber.$amount.$paymentRef;
-
+        $string = $invoiceNumber.$paymentRef.$amount.$RequestReference;
         return base64_encode(hash_hmac('sha256', $string, $this->secretKey, true));
     }
 
@@ -270,11 +293,11 @@ class Cbs
      */
     public function getPaymentData()
     {
-        $mac = $this->computeMac(request()->InvoiceNumber, request()->PaymentRef, request()->AmountPaid);
+        $mac = $this->computeMac(request()->InvoiceNumber, request()->PaymentRef, request()->AmountPaid, request()->RequestReference);
         if ($mac != request()->Mac) {
             throw new InvalidPostException('Invalid Call');
         } else {
-            return request()->all();
+            return response()->json(request()->toArray());
         }
     }
 }
