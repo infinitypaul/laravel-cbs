@@ -180,7 +180,7 @@ class Cbs
                 'Email' => $data['email'],
                 'Address' => $data['address'],
                 'PhoneNumber' => $data['mobile_number'],
-                'TaxPayerIdentificationNumber' => $data['tin'],
+                'TaxPayerIdentificationNumber' => isset($data['tin']) ? $data['tin'] : '',
             ];
         }
 
